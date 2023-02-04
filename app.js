@@ -37,7 +37,6 @@ app.use(session({
   store: store
 }));
 
-
 //DB
 const mongoAtlasUri = "mongodb+srv://sokosbox:PassAufImInternet@cluster0.ybtnjia.mongodb.net/sokosDB?retryWrites=true&w=majority";
 mongoose.set('strictQuery', true);
