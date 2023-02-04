@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-sm bg-body-tertiary navbar-dark bg-dark" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">SoKo's Box</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+      aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav me-auto my-2 my-lg-0">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Projekte
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/todo">To Do's</a></li>
+            <li><a class="dropdown-item" href="/blog">Blog</a></li>
+            <li><a class="dropdown-item" href="/wichtelfee">Wichtel Fee</a></li>
+            <li><a class="dropdown-item" href="/snomast">SNOMAST 2.0</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            About
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/contact">Kontakt</a></li>
+          </ul>
+        </li>
+        <% if (sessionInfo) { %>
+          <li><a class="nav-link nav-user-auth" href="/logout">Logout</a></li>
+          <% } else { %>
+            </li><a class="nav-link nav-user-auth" href="/login">Login</a></li>
+            <li><a class="nav-link nav-user-auth" href="/register">Register</a></li>
+            <% } %>
+              
+      </ul>
+    </div>
+  </div>
+</nav>
