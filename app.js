@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-const MONGODB_URI = 'mongodb+srv://sokosbox:PassAufImInternet@cluster0.ybtnjia.mongodb.net/sokosDB?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
 
@@ -31,16 +31,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('trust proxy', 1);
 app.use(session({
-  secret: 'PassAufImInternet24x7',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUnitialized: false,
   store: store
 }));
 
 //DB
-const mongoAtlasUri = "mongodb+srv://sokosbox:PassAufImInternet@cluster0.ybtnjia.mongodb.net/sokosDB?retryWrites=true&w=majority";
+
 mongoose.set('strictQuery', true);
-mongoose.connect(mongoAtlasUri, { useNewUrlParser: true });
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema({
   fName: String,
@@ -58,6 +58,7 @@ const saltRounds = 10;
 
 //Routes
 app.get("/", (req, res) => {
+  req.session.path = "home";
   const session = req.session;
   console.log(JSON.stringify(session));
   res.render("home", { sessionInfo: session.isLoggedIn });
@@ -84,8 +85,9 @@ app.route("/login")
             }
             else if (result) {
               req.session.isLoggedIn = true;
+              const session = req.session;
               console.log(JSON.stringify(session));
-              res.redirect(req.session.path);
+              res.render(req.session.path, { sessionInfo: session.isLoggedIn });
             }
             else if (!result) {
               res.redirect("login");
@@ -152,7 +154,7 @@ app.route("/register")
 // -Blog
 app.route("/blog")
   .get((req, res) => {
-    req.session.path = "/blog";
+    req.session.path = "blog";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
@@ -166,7 +168,7 @@ app.route("/blog")
 //-Snomast
 app.route("/snomast")
   .get((req, res) => {
-    req.session.path = "/snomast";
+    req.session.path = "snomast";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
@@ -180,7 +182,7 @@ app.route("/snomast")
 //-To Do's
 app.route("/todo")
   .get((req, res) => {
-    req.session.path = "/todo";
+    req.session.path = "todo";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
@@ -195,7 +197,7 @@ app.route("/todo")
 //-Wichtel Fee
 app.route("/wichtelfee")
   .get((req, res) => {
-    req.session.path = "/wichtelfee";
+    req.session.path = "wichtelfee";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
@@ -210,7 +212,7 @@ app.route("/wichtelfee")
 //-Kontakt
 app.route("/contact")
   .get((req, res) => {
-    req.session.path = "/contact";
+    req.session.path = "contact";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
