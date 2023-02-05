@@ -242,8 +242,50 @@ app.route("/wichtelfee")
     } else {
       res.render("login", { sessionInfo: session.isLoggedIn });
     }
+  });
+
+app.route("/wichtelHRoffice")
+  .get((req, res) => {
+    req.session.path = "wichtelHRoffice";
+    const session = req.session;
+    console.log(JSON.stringify(req.session));
+
+    if (session.isLoggedIn) {
+      res.render("wichtelhroffice", { sessionInfo: session.isLoggedIn });
+    } else {
+      res.render("login", { sessionInfo: session.isLoggedIn });
+    }
+  })
+  .post((req, res) => {
 
   });
+
+app.route("/wichtelunterschlupf")
+  .get((req, res) => {
+    req.session.path = "wichtelunterschlupf";
+    const session = req.session;
+    console.log(JSON.stringify(req.session));
+
+    if (session.isLoggedIn) {
+      res.render("wichtelunterschlupf", { sessionInfo: session.isLoggedIn });
+    } else {
+      res.render("login", { sessionInfo: session.isLoggedIn });
+    }
+  });
+
+  app.route("/wichtelsession")
+  .get((req, res) => {
+    req.session.path = "wichtelsession";
+    const session = req.session;
+    console.log(JSON.stringify(req.session));
+
+    if (session.isLoggedIn) {
+      res.render("wichtelsession", { sessionInfo: session.isLoggedIn });
+    } else {
+      res.render("login", { sessionInfo: session.isLoggedIn });
+    }
+  });
+
 
 //-Kontakt
 app.route("/contact")
@@ -259,9 +301,6 @@ app.route("/contact")
     }
 
   });
-
-
-
 
 app.listen(3000, function () {
   console.log("Server started on port 3000");
