@@ -50,8 +50,44 @@ const userSchema = new mongoose.Schema({
   password: String,
 
 });
-
 const User = mongoose.model("User", userSchema);
+
+const wichtelsessionSchema = new mongoose.Schema({
+  sessionName: String,
+  einladungen: {
+    name: String,
+    email: String
+  },
+  wichtel: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User
+    },
+    wichtelVon: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User
+    },
+    wishes: String
+  }]
+});
+const Wichtelsession = mongoose.model("Wichtelsession", wichtelsessionSchema);
+
+const wichtelgruppeSchema = new mongoose.Schema({
+  wgName: String,
+  wgOwner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User
+  },
+  sessions: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Wichtelsession
+  }
+});
+const Wichtelgruppe = mongoose.model("Wichtelgruppe", wichtelgruppeSchema);
+
+
+
+
 
 //bcrypt
 const saltRounds = 10;
