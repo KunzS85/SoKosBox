@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+    <div class="center">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Wichtel HR Office</h5>
+                <form action="/wichtelHRoffice" method="POST">
+                    <div class="form-group mb-2">
+                        <label for="gruppenName">Gruppenname</label>
+                        <input type="text" class="form-control" name="gruppenName">
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-outline-success">Gruppe erstellen</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <%- include('partials/footer') %>

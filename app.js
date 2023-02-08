@@ -54,10 +54,10 @@ const User = mongoose.model("User", userSchema);
 
 const wichtelsessionSchema = new mongoose.Schema({
   sessionName: String,
-  einladungen: {
+  einladungen: [{
     name: String,
     email: String
-  },
+  }],
   wichtel: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -78,21 +78,24 @@ const wichtelgruppeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: User
   },
-  sessions: {
+  sessions: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: Wichtelsession
-  }
+  }]
 });
 const Wichtelgruppe = mongoose.model("Wichtelgruppe", wichtelgruppeSchema);
-
-
-
 
 
 //bcrypt
 const saltRounds = 10;
 
+/*TODO's:
+- Prüfen ob lodash genutz werden muss bei Inputfelder
+*/
+
 //Routes
+
+//Home
 app.get("/", (req, res) => {
   req.session.path = "home";
   const session = req.session;
@@ -121,9 +124,12 @@ app.route("/login")
             }
             else if (result) {
               req.session.isLoggedIn = true;
+              req.session.userID = foundUser._id;
               const session = req.session;
               console.log(JSON.stringify(session));
-              res.render(req.session.path, { sessionInfo: session.isLoggedIn });
+              res.render(req.session.path, {
+                sessionInfo: session.isLoggedIn
+              });
             }
             else if (!result) {
               res.redirect("login");
@@ -257,7 +263,36 @@ app.route("/wichtelHRoffice")
     }
   })
   .post((req, res) => {
+    const { gruppenName } = req.body;
+    const owner = req.session.userID;
 
+    Wichtelgruppe.findOne({ wgName: gruppenName }, (err, foundGroup) => {
+      if (err) {
+        console.log(err)
+      }
+      if (foundGroup) {
+        console.log("Gruppe besteht bereits")
+        // Meldung an User
+        res.redirect("wichtelhroffice");
+      } else {
+        const newGroup = new Wichtelgruppe({
+          wgName: gruppenName,
+          wgOwner: owner
+        });
+        newGroup.save((error) => {
+          if (!error) {
+            req.session.path = "wichtelsession";
+            const session = req.session;
+            console.log(JSON.stringify(req.session));
+            res.render("wichtelsession", { 
+              sessionInfo: session.isLoggedIn,
+              gruppenName: gruppenName,
+
+            });
+          }
+        });
+      }
+    });
   });
 
 app.route("/wichtelunterschlupf")
@@ -273,17 +308,28 @@ app.route("/wichtelunterschlupf")
     }
   });
 
-  app.route("/wichtelsession")
+app.route("/wichtelsession")
   .get((req, res) => {
     req.session.path = "wichtelsession";
     const session = req.session;
     console.log(JSON.stringify(req.session));
 
     if (session.isLoggedIn) {
-      res.render("wichtelsession", { sessionInfo: session.isLoggedIn });
+      const { gruppenName } = req.body;
+      const { wichtelsession } = req.body;
+
+      res.render("wichtelsession", { 
+        sessionInfo: session.isLoggedIn,
+        gruppenName: gruppenName,
+        wichtelsessionName: wichtelsessionName,
+        
+      });
     } else {
       res.render("login", { sessionInfo: session.isLoggedIn });
     }
+  })
+  .post((req, res) => {
+
   });
 
 

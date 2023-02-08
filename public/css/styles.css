@@ -15,6 +15,17 @@
     color: 	#198754;
 }
 
+.fullScreenCenterCard {
+    width: 75%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0 2rem 0;
+}
+
+.cardSpace {
+    margin: 1rem 1rem 1rem 1rem;
+}
 
 
 
