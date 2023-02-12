@@ -265,6 +265,7 @@ app.route("/wichtelHRoffice")
   .post((req, res) => {
     const { gruppenName } = req.body;
     const owner = req.session.userID;
+    const session = req.session;
 
     Wichtelgruppe.findOne({ wgName: gruppenName }, (err, foundGroup) => {
       if (err) {
@@ -275,20 +276,19 @@ app.route("/wichtelHRoffice")
         // Meldung an User
         res.redirect("wichtelhroffice");
       } else {
-        const newGroup = new Wichtelgruppe({
-          wgName: gruppenName,
-          wgOwner: owner
-        });
-        newGroup.save((error) => {
-          if (!error) {
-            req.session.path = "wichtelsession";
-            const session = req.session;
-            console.log(JSON.stringify(req.session));
-            res.render("wichtelsession", { 
-              sessionInfo: session.isLoggedIn,
-              gruppenName: gruppenName,
-
-            });
+        User.findById(owner, (err, foundUser) => {
+          if (err) {
+            console.log(err);
+          } else {
+            if (foundUser) {
+              res.render("wichtelsession", {
+                sessionInfo: session.isLoggedIn,
+                gruppenName: gruppenName,
+                ownerName: foundUser.fName
+              });
+            } else {
+              console.log("kein User");
+            }
           }
         });
       }
@@ -302,6 +302,7 @@ app.route("/wichtelunterschlupf")
     console.log(JSON.stringify(req.session));
 
     if (session.isLoggedIn) {
+
       res.render("wichtelunterschlupf", { sessionInfo: session.isLoggedIn });
     } else {
       res.render("login", { sessionInfo: session.isLoggedIn });
@@ -309,28 +310,43 @@ app.route("/wichtelunterschlupf")
   });
 
 app.route("/wichtelsession")
-  .get((req, res) => {
-    req.session.path = "wichtelsession";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
-
-    if (session.isLoggedIn) {
-      const { gruppenName } = req.body;
-      const { wichtelsession } = req.body;
-
-      res.render("wichtelsession", { 
-        sessionInfo: session.isLoggedIn,
-        gruppenName: gruppenName,
-        wichtelsessionName: wichtelsessionName,
-        
-      });
-    } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
-    }
-  })
   .post((req, res) => {
+    console.log("in der wichtelsession");
+    const { gruppenName, wichtelsessionName } = req.body;
+    const recipients = eval(req.body.recipients)
+    const owner = req.session.userID;
+    const session = req.session;
+    console.log();
 
+    const newSession = new Wichtelsession({
+      sessionName: wichtelsessionName,
+      einladungen: recipients,
+      wichtel: [{
+        user: owner
+      }]
+    });
+// Hier stehen geblieben -> Testen notwendig
+    newSession.save((error) => {
+      if (!error) {
+        console.log(newSession._id);
+        const newGroup = new Wichtelgruppe({
+          wgName: gruppenName,
+          wgOwner: owner,
+          sessions: newSession._id
+        });
+        newGroup.save((error) => {
+          if (!error) {
+            console.log("aufruf der session")
+            req.session.path = "wichtelunterschlupf";
+            const session = req.session;
+            console.log(JSON.stringify(req.session));
+
+          }
+        });
+      }
+    });
   });
+
 
 
 //-Kontakt
