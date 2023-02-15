@@ -97,18 +97,14 @@ const saltRounds = 10;
 
 //Home
 app.get("/", (req, res) => {
-  req.session.path = "home";
-  const session = req.session;
-  console.log(JSON.stringify(session));
-  res.render("home", { sessionInfo: session.isLoggedIn });
+  req.session.path = "/";
+  res.render("home", { sessionInfo: req.session.isLoggedIn });
 });
 
 //-Login
 app.route("/login")
   .get((req, res) => {
-    const session = req.session;
-    console.log(JSON.stringify(session));
-    res.render("login", { sessionInfo: session.isLoggedIn });
+    res.render("login", { sessionInfo: req.session.isLoggedIn });
   })
   .post((req, res) => {
     const { userName, password } = req.body
@@ -125,11 +121,7 @@ app.route("/login")
             else if (result) {
               req.session.isLoggedIn = true;
               req.session.userID = foundUser._id;
-              const session = req.session;
-              console.log(JSON.stringify(session));
-              res.render(req.session.path, {
-                sessionInfo: session.isLoggedIn
-              });
+              res.redirect(req.session.path)
             }
             else if (!result) {
               res.redirect("login");
@@ -146,8 +138,6 @@ app.route("/login")
 //-Logout
 app.route("/logout")
   .get((req, res) => {
-    const session = req.session;
-    console.log(JSON.stringify(req.session))
     req.session.destroy(() => {
       console.log(JSON.stringify(req.session))
       res.redirect("/");
@@ -157,9 +147,7 @@ app.route("/logout")
 //-Register
 app.route("/register")
   .get((req, res) => {
-    const session = req.session;
-    console.log(JSON.stringify(req.session))
-    res.render("register", { sessionInfo: session.isLoggedIn });
+    res.render("register", { sessionInfo: req.session.isLoggedIn });
   })
   .post((req, res) => {
     const { fName, lName, userName, email, password } = req.body
@@ -184,7 +172,7 @@ app.route("/register")
             });
             newUser.save((error) => {
               if (!error) {
-                res.render("login", { sessionInfo: session.isLoggedIn });
+                res.render("login", { sessionInfo: req.session.isLoggedIn });
               }
             });
           }
@@ -197,13 +185,11 @@ app.route("/register")
 app.route("/blog")
   .get((req, res) => {
     req.session.path = "blog";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("blog", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("blog", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
   });
 
@@ -211,13 +197,11 @@ app.route("/blog")
 app.route("/snomast")
   .get((req, res) => {
     req.session.path = "snomast";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("snomast", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("snomast", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
   });
 
@@ -225,13 +209,11 @@ app.route("/snomast")
 app.route("/todo")
   .get((req, res) => {
     req.session.path = "todo";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("todo", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("todo", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
 
   });
@@ -240,83 +222,51 @@ app.route("/todo")
 app.route("/wichtelfee")
   .get((req, res) => {
     req.session.path = "wichtelfee";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("wichtelfee", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("wichtelfee", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
   });
 
 app.route("/wichtelHRoffice")
   .get((req, res) => {
     req.session.path = "wichtelHRoffice";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("wichtelhroffice", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("wichtelhroffice", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
   })
   .post((req, res) => {
     const { gruppenName } = req.body;
     const owner = req.session.userID;
-    const session = req.session;
 
-    Wichtelgruppe.findOne({ wgName: gruppenName }, (err, foundGroup) => {
+    User.findById(owner, (err, foundUser) => {
       if (err) {
-        console.log(err)
-      }
-      if (foundGroup) {
-        console.log("Gruppe besteht bereits")
-        // Meldung an User
-        res.redirect("wichtelhroffice");
+        console.log(err);
       } else {
-        User.findById(owner, (err, foundUser) => {
-          if (err) {
-            console.log(err);
-          } else {
-            if (foundUser) {
-              res.render("wichtelsession", {
-                sessionInfo: session.isLoggedIn,
-                gruppenName: gruppenName,
-                ownerName: foundUser.fName
-              });
-            } else {
-              console.log("kein User");
-            }
-          }
-        });
+        if (foundUser) {
+          res.render("wichtelsession", {
+            sessionInfo: req.session.isLoggedIn,
+            gruppenName: gruppenName,
+            ownerName: foundUser.fName
+          });
+        } else {
+          console.log("kein User");
+        }
       }
     });
   });
 
-app.route("/wichtelunterschlupf")
-  .get((req, res) => {
-    req.session.path = "wichtelunterschlupf";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
-
-    if (session.isLoggedIn) {
-
-      res.render("wichtelunterschlupf", { sessionInfo: session.isLoggedIn });
-    } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
-    }
-  });
 
 app.route("/wichtelsession")
   .post((req, res) => {
-    console.log("in der wichtelsession");
     const { gruppenName, wichtelsessionName } = req.body;
     const recipients = eval(req.body.recipients)
     const owner = req.session.userID;
-    const session = req.session;
-    console.log();
 
     const newSession = new Wichtelsession({
       sessionName: wichtelsessionName,
@@ -325,10 +275,9 @@ app.route("/wichtelsession")
         user: owner
       }]
     });
-// Hier stehen geblieben -> Testen notwendig
+
     newSession.save((error) => {
       if (!error) {
-        console.log(newSession._id);
         const newGroup = new Wichtelgruppe({
           wgName: gruppenName,
           wgOwner: owner,
@@ -336,11 +285,8 @@ app.route("/wichtelsession")
         });
         newGroup.save((error) => {
           if (!error) {
-            console.log("aufruf der session")
             req.session.path = "wichtelunterschlupf";
-            const session = req.session;
-            console.log(JSON.stringify(req.session));
-
+            res.redirect("wichtelunterschlupf");
           }
         });
       }
@@ -348,18 +294,60 @@ app.route("/wichtelsession")
   });
 
 
+app.route("/wichtelunterschlupf")
+  .get((req, res) => {
+    req.session.path = "wichtelunterschlupf";
+
+    if (req.session.isLoggedIn) {
+      Wichtelsession.find({ 'wichtel.user': req.session.userID }, (err, foundSessions) => {
+        if (err) {
+          console.log(err);
+        } else {
+          if (foundSessions) {
+            foundSessions.forEach(elem => {
+              Wichtelgruppe.find({ 'sessions.0': elem._id }, (err, foundGroup) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  if (foundGroup) {
+                    const allInfos = [];
+                    foundGroup.forEach(el => {
+                      allInfos.push({
+                        groupName: el.wgName,
+                        groupID: el._id,
+                        sessionName: elem.sessionName,
+                        sessionID: elem._id
+                      })
+                    });
+                    console.log(foundSessions);
+                    console.log(foundGroup);
+                    console.log(allInfos);
+                    res.render("wichtelunterschlupf", { sessionInfo: req.session.isLoggedIn });
+                  } else {
+                    res.render("wichtelunterschlupf", { sessionInfo: req.session.isLoggedIn });
+                  }
+                }
+              })
+            });
+          } else {
+            res.render("wichtelunterschlupf", { sessionInfo: req.session.isLoggedIn });
+          }
+        }
+      });
+    } else {
+      res.redirect("login");
+    }
+  });
 
 //-Kontakt
 app.route("/contact")
   .get((req, res) => {
     req.session.path = "contact";
-    const session = req.session;
-    console.log(JSON.stringify(req.session));
 
-    if (session.isLoggedIn) {
-      res.render("contact", { sessionInfo: session.isLoggedIn });
+    if (req.session.isLoggedIn) {
+      res.render("contact", { sessionInfo: req.session.isLoggedIn });
     } else {
-      res.render("login", { sessionInfo: session.isLoggedIn });
+      res.redirect("login");
     }
 
   });

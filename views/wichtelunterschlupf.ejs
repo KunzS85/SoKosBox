@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+
+
+    <div class="center">
+    <% foreach %>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title d-flex justify-content-center">
+                    <%= sessionName %>
+                </h5>
+                <p class="card-text">Dieser Wichtel-Event wurde durch die Gruppe "<%= gruppenName %>" erstellt.</p>
+                <a href="/wichtelHRoffice/:<%-sessionID%>" class="btn btn-outline-success">Zum Event</a>
+            </div>
+        </div>
+    <% foreach end %>
+    </div>
+
+
+
+<%- include('partials/footer') %>
